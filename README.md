@@ -10,7 +10,7 @@ La aplicación se publica en [dmarcosl.github.io/tur](https://dmarcosl.github.io
 
 La resolución vigente desde el 1 de octubre de 2026 aplica medidas temporales aprobadas en el Real Decreto-ley 25/2026. Los valores están cotejados con la resolución publicada en el BOE, no son una estimación propia.
 
-La serie histórica de la CNMC se atribuye a [Componentes de la Tarifa de Último Recurso](https://catalogodatos.cnmc.es/dataset/ds_1607_1), bajo licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Consulta el [texto de la licencia](https://creativecommons.org/licenses/by-sa/4.0/legalcode.es) para las condiciones de atribución, indicación de cambios y compartir igual. Las resoluciones del BOE están enlazadas desde cada registro y desde las tarjetas de precios vigentes.
+La serie histórica de la CNMC se atribuye a [Componentes de la Tarifa de Último Recurso](https://catalogodatos.cnmc.es/dataset/ds_1607_1), bajo licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Los datos CNMC se han adaptado al esquema JSON del proyecto y se han combinado con registros construidos a partir de resoluciones del BOE. Consulta el [texto de la licencia](https://creativecommons.org/licenses/by-sa/4.0/legalcode.es) para las condiciones de atribución, indicación de cambios y compartir igual. Las resoluciones del BOE están enlazadas desde cada registro y desde las tarjetas de precios vigentes.
 
 ## Licencias y fuentes
 

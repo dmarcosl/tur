@@ -5,7 +5,8 @@
     "dataset": "Componentes de la Tarifa de Último Recurso",
     "license": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "historicalSourceUrl": "https://catalogodatos.cnmc.es/dataset/ds_1607_1"
+    "historicalSourceUrl": "https://catalogodatos.cnmc.es/dataset/ds_1607_1",
+    "changes": "Datos de la CNMC adaptados al esquema JSON del proyecto; desde octubre de 2021, la serie se continúa con datos de resoluciones del BOE."
   },
   "coverage": {
     "cnmcMonthlyThrough": "2021-09",
