@@ -22,7 +22,7 @@ const messages = {
     fixedUnit: "€/mes",
     variableFootnote: "El término variable se expresa por kilovatio hora.",
     fixedFootnote: "El término fijo se expresa por cliente y mes.",
-    chartInteractionHint: "Pasa el cursor o enfoca un punto para consultar su fecha y precio.",
+    chartInteractionHint: "Mueve el cursor por el gráfico o enfoca un punto para comparar las tres tarifas.",
     historyNote: "La serie de la CNMC es mensual hasta septiembre de 2021. TUR.3 aparece desde octubre de 2021. Las líneas muestran los precios por periodos, no una variación diaria.",
     footerDescriptor: "Datos abiertos, precios regulados",
     attribution: "Serie histórica: CNMC, enero de 2009–septiembre de 2021 (CC BY-SA 4.0). Desde octubre de 2021: resoluciones del BOE.",
@@ -32,6 +32,9 @@ const messages = {
     variableMetric: "Variable",
     effectiveFrom: "Vigente desde",
     officialSource: "Ver fuente oficial",
+    changeVsPrevious: "frente a la revisión anterior",
+    firstRevision: "Primera revisión",
+    noData: "Sin dato",
     temporaryMeasure: "Cálculo sujeto a medidas extraordinarias vigentes para este periodo.",
     bandTUR1: "Hasta 5.000 kWh/año",
     bandTUR2: "Más de 5.000 y hasta 15.000 kWh/año",
@@ -65,7 +68,7 @@ const messages = {
     fixedUnit: "€/month",
     variableFootnote: "The variable charge is shown per kilowatt hour.",
     fixedFootnote: "The fixed charge is shown per customer and month.",
-    chartInteractionHint: "Hover over or focus a point to see its date and price.",
+    chartInteractionHint: "Move across the chart or focus a point to compare all three tariffs.",
     historyNote: "The CNMC series is monthly through September 2021. TUR.3 starts in October 2021. The step lines show prices by effective period, not daily changes.",
     footerDescriptor: "Open data, regulated prices",
     attribution: "Historical series: CNMC, January 2009–September 2021 (CC BY-SA 4.0). From October 2021: BOE resolutions.",
@@ -75,6 +78,9 @@ const messages = {
     variableMetric: "Variable",
     effectiveFrom: "In effect from",
     officialSource: "View official source",
+    changeVsPrevious: "versus the previous revision",
+    firstRevision: "First revision",
+    noData: "No data",
     temporaryMeasure: "Calculation is subject to temporary measures in effect for this period.",
     bandTUR1: "Up to 5,000 kWh/year",
     bandTUR2: "More than 5,000 and up to 15,000 kWh/year",
@@ -189,26 +195,42 @@ function getTariffLabel(tariff) {
   return currentMessages()[`band${tariff.replace(".", "")}`];
 }
 
-function latestByTariff() {
-  const latest = new Map();
-  for (const item of dataset.observations) {
-    const previous = latest.get(item.tariff);
-    if (!previous || periodTime(item.period, item.precision) > periodTime(previous.period, previous.precision)) {
-      latest.set(item.tariff, item);
-    }
+function observationsByTariff() {
+  const grouped = new Map(tariffOrder.map((tariff) => [tariff, []]));
+  for (const item of dataset.observations) grouped.get(item.tariff)?.push(item);
+  for (const items of grouped.values()) {
+    items.sort((a, b) => periodTime(a.period, a.precision) - periodTime(b.period, b.precision));
   }
-  return latest;
+  return grouped;
+}
+
+function percentageChange(current, previous) {
+  const before = Number(previous);
+  if (!Number.isFinite(before) || before === 0) return null;
+  return ((Number(current) - before) / before) * 100;
+}
+
+function formatChange(change) {
+  const copy = currentMessages();
+  if (change === null || !Number.isFinite(change)) return { direction: "first", text: copy.firstRevision };
+  const direction = change > 0 ? "up" : change < 0 ? "down" : "unchanged";
+  const arrow = change > 0 ? "↑" : change < 0 ? "↓" : "→";
+  return { direction, text: `${arrow} ${numberFormatter(2).format(Math.abs(change))} % ${copy.changeVsPrevious}` };
 }
 
 function renderCards() {
   const cards = document.getElementById("price-cards");
-  const latest = latestByTariff();
+  const histories = observationsByTariff();
   const copy = currentMessages();
   cards.replaceChildren();
 
   for (const tariff of tariffOrder) {
-    const item = latest.get(tariff);
+    const history = histories.get(tariff) || [];
+    const item = history.at(-1);
     if (!item) continue;
+    const previous = history.at(-2);
+    const variableChange = formatChange(previous ? percentageChange(item.variableCentKwh, previous.variableCentKwh) : null);
+    const fixedChange = formatChange(previous ? percentageChange(item.fixedEurMonth, previous.fixedEurMonth) : null);
 
     const card = document.createElement("article");
     card.className = "price-card";
@@ -223,10 +245,10 @@ function renderCards() {
       </div>
       <p class="consumption-band">${getTariffLabel(tariff)}</p>
       <div class="metric-block">
-        <div><span class="metric-label">${copy.variableMetric}</span><strong class="metric-value">${formatVariable(item.variableCentKwh)}</strong></div>
+        <div class="metric-content"><span class="metric-label">${copy.variableMetric}</span><strong class="metric-value">${formatVariable(item.variableCentKwh)}</strong><span class="metric-change" data-direction="${variableChange.direction}">${variableChange.text}</span></div>
       </div>
       <div class="metric-block">
-        <div><span class="metric-label">${copy.fixedMetric}</span><strong class="metric-value">${formatFixed(item.fixedEurMonth)}</strong></div>
+        <div class="metric-content"><span class="metric-label">${copy.fixedMetric}</span><strong class="metric-value">${formatFixed(item.fixedEurMonth)}</strong><span class="metric-change" data-direction="${fixedChange.direction}">${fixedChange.text}</span></div>
       </div>
       <a class="card-source" href="${escapeAttribute(item.sourceUrl)}" target="_blank" rel="noopener noreferrer">
         <span>${copy.officialSource}</span><span class="external-arrow" aria-hidden="true">↗</span>
@@ -267,17 +289,36 @@ function positionChartTooltip(clientX, clientY) {
   tooltip.style.top = `${top}px`;
 }
 
-function showChartTooltip(tariff, date, value, clientX, clientY) {
+function showChartTooltip(chartId, date, rows, clientX, clientY) {
   const tooltip = document.getElementById("chart-tooltip");
-  const pointKey = `${tariff}:${date}:${value}`;
+  const pointKey = `${chartId}:${date}:${rows.map((row) => `${row.tariff}:${row.value}:${row.changeText}`).join("|")}`;
   if (tooltip.hidden || tooltip.dataset.pointKey !== pointKey) {
     const heading = document.createElement("span");
     heading.className = "chart-tooltip-heading";
-    heading.textContent = `${tariff} · ${date}`;
-    const amount = document.createElement("strong");
-    amount.className = "chart-tooltip-value";
-    amount.textContent = value;
-    tooltip.replaceChildren(heading, amount);
+    heading.textContent = date;
+    const list = document.createElement("div");
+    list.className = "chart-tooltip-list";
+    for (const rowData of rows) {
+      const row = document.createElement("div");
+      row.className = "chart-tooltip-row";
+      row.style.setProperty("--series-color", getComputedStyle(root).getPropertyValue(paletteKeys[rowData.tariff]).trim());
+      const top = document.createElement("div");
+      top.className = "chart-tooltip-row-top";
+      const tariff = document.createElement("span");
+      tariff.className = "chart-tooltip-tariff";
+      tariff.textContent = rowData.tariff;
+      const amount = document.createElement("strong");
+      amount.className = "chart-tooltip-value";
+      amount.textContent = rowData.value;
+      top.append(tariff, amount);
+      const change = document.createElement("span");
+      change.className = "chart-tooltip-change";
+      change.dataset.direction = rowData.changeDirection || "first";
+      change.textContent = rowData.changeText;
+      row.append(top, change);
+      list.append(row);
+    }
+    tooltip.replaceChildren(heading, list);
     tooltip.dataset.pointKey = pointKey;
   }
   tooltip.hidden = false;
@@ -287,7 +328,10 @@ function showChartTooltip(tariff, date, value, clientX, clientY) {
 function hideChartTooltip() {
   const tooltip = document.getElementById("chart-tooltip");
   if (tooltip) tooltip.hidden = true;
+  if (activeChartCursor) activeChartCursor.setAttribute("visibility", "hidden");
 }
+
+let activeChartCursor = null;
 
 function chartData(field, convert = (value) => Number(value)) {
   const series = new Map(tariffOrder.map((tariff) => [tariff, []]));
@@ -300,6 +344,90 @@ function chartData(field, convert = (value) => Number(value)) {
   }
   for (const points of series.values()) points.sort((a, b) => periodTime(a.period, a.precision) - periodTime(b.period, b.precision));
   return series;
+}
+
+function nearestPeriod(periods, targetTime) {
+  let nearest = periods[0];
+  let distance = Infinity;
+  for (const period of periods) {
+    const currentDistance = Math.abs(period.time - targetTime);
+    if (currentDistance < distance) {
+      nearest = period;
+      distance = currentDistance;
+    }
+  }
+  return nearest;
+}
+
+function pointAtOrBefore(points, targetTime) {
+  let low = 0;
+  let high = points.length - 1;
+  let result = -1;
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const time = periodTime(points[middle].period, points[middle].precision);
+    if (time <= targetTime) {
+      result = middle;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+  return result;
+}
+
+function previousDistinctValue(points, index) {
+  const current = points[index];
+  for (let previousIndex = index - 1; previousIndex >= 0; previousIndex -= 1) {
+    if (points[previousIndex].value !== current.value) return points[previousIndex];
+  }
+  return null;
+}
+
+function updateChartHover({ svg, svgId, series, valueFormatter, xScale, yScale, plotBottom, periods, targetTime, clientX, clientY }) {
+  const nearest = nearestPeriod(periods, targetTime);
+  if (!nearest) return;
+  const date = formatPeriod(nearest.period, nearest.precision, nearest.precision === "day");
+  const rows = tariffOrder.map((tariff) => {
+    const points = series.get(tariff) || [];
+    const index = pointAtOrBefore(points, nearest.time);
+    if (index < 0) return { tariff, value: currentMessages().noData, changeText: currentMessages().noData };
+    const point = points[index];
+    const previous = previousDistinctValue(points, index);
+    const changePercent = previous ? percentageChange(point.value, previous.value) : null;
+    const change = formatChange(changePercent);
+    return {
+      tariff,
+      value: valueFormatter(point.value),
+      changeText: change.text,
+      changeDirection: change.direction,
+    };
+  });
+  const markerX = xScale(nearest.time);
+  const cursor = svg.querySelector(".chart-crosshair");
+  cursor.replaceChildren(createSvgElement("line", {
+    class: "chart-crosshair-line",
+    x1: markerX,
+    x2: markerX,
+    y1: 24,
+    y2: plotBottom,
+  }));
+  for (const tariff of tariffOrder) {
+    if (!visibleTariffs.has(tariff)) continue;
+    const points = series.get(tariff) || [];
+    const index = pointAtOrBefore(points, nearest.time);
+    if (index < 0) continue;
+    cursor.append(createSvgElement("circle", {
+      class: "chart-crosshair-point",
+      cx: markerX,
+      cy: yScale(points[index].value),
+      r: 4.2,
+      style: `--series-color: ${getComputedStyle(root).getPropertyValue(paletteKeys[tariff]).trim()}`,
+    }));
+  }
+  cursor.setAttribute("visibility", "visible");
+  activeChartCursor = cursor;
+  showChartTooltip(svgId, date, rows, clientX, clientY);
 }
 
 function changedPoints(points) {
@@ -389,6 +517,10 @@ function renderChart(svgId, legendId, series, unit, descriptionKey, valueFormatt
   const scale = niceScale(Math.max(...allValues, 0.00001));
   const x = (time) => plotLeft + ((time - min) / Math.max(max - min, 1)) * plotWidth;
   const y = (value) => plotBottom - (value / scale.top) * plotHeight;
+  const periods = [...new Map([...series.values()].flat().map((point) => {
+    const time = periodTime(point.period, point.precision);
+    return [time, { period: point.period, precision: point.precision, time }];
+  })).values()].sort((a, b) => a.time - b.time);
 
   const gridGroup = createSvgElement("g", { "aria-hidden": "true" });
   for (const tick of scale.ticks) {
@@ -448,18 +580,27 @@ function renderChart(svgId, legendId, series, unit, descriptionKey, valueFormatt
         r: 10,
         tabindex: "0",
         role: "img",
-        "aria-label": ariaLabel,
+        "aria-label": `${ariaLabel}, ${valueText}`,
         "aria-describedby": "chart-tooltip",
         style: `--series-color: ${color}`,
       });
-      const showAtPointer = (event) => showChartTooltip(tariff, pointDate, valueText, event.clientX, event.clientY);
+      const pointTime = periodTime(point.period, point.precision);
       const showOnFocus = () => {
         const bounds = hitTarget.getBoundingClientRect();
-        showChartTooltip(tariff, pointDate, valueText, bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+        updateChartHover({
+          svg,
+          svgId,
+          series,
+          valueFormatter,
+          xScale: x,
+          yScale: y,
+          plotBottom,
+          periods,
+          targetTime: pointTime,
+          clientX: bounds.left + bounds.width / 2,
+          clientY: bounds.top + bounds.height / 2,
+        });
       };
-      hitTarget.addEventListener("pointerenter", showAtPointer);
-      hitTarget.addEventListener("pointermove", showAtPointer);
-      hitTarget.addEventListener("pointerleave", hideChartTooltip);
       hitTarget.addEventListener("focus", showOnFocus);
       hitTarget.addEventListener("blur", hideChartTooltip);
 
@@ -484,6 +625,34 @@ function renderChart(svgId, legendId, series, unit, descriptionKey, valueFormatt
       "text-anchor": "middle",
     }, copy.chartNoSeries));
   }
+  svg.append(createSvgElement("g", { class: "chart-crosshair", visibility: "hidden", "aria-hidden": "true" }));
+  svg.onpointermove = (event) => {
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const local = point.matrixTransform(matrix.inverse());
+    if (local.x < plotLeft || local.x > plotRight || local.y < plotTop || local.y > plotBottom) {
+      hideChartTooltip();
+      return;
+    }
+    const targetTime = min + ((local.x - plotLeft) / plotWidth) * (max - min);
+    updateChartHover({
+      svg,
+      svgId,
+      series,
+      valueFormatter,
+      xScale: x,
+      yScale: y,
+      plotBottom,
+      periods,
+      targetTime,
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+  };
+  svg.onpointerleave = hideChartTooltip;
   renderLegend(legendId);
 }
 

@@ -13,6 +13,8 @@
   --series-1: #66dcb9;
   --series-2: #9bbdff;
   --series-3: #f1bd70;
+  --trend-up: #f07d72;
+  --trend-down: #52d59a;
   --grid: rgba(211, 224, 215, 0.12);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -35,6 +37,8 @@
   --series-1: #087e62;
   --series-2: #416fc1;
   --series-3: #9a620c;
+  --trend-up: #b43e35;
+  --trend-down: #087e62;
   --grid: rgba(31, 54, 44, 0.13);
   --shadow: 0 18px 50px rgba(32, 57, 44, 0.06);
 }
@@ -453,6 +457,10 @@ h1 span {
   gap: 16px;
 }
 
+.metric-content {
+  min-width: 0;
+}
+
 .metric-block + .metric-block {
   margin-top: 10px;
   padding-top: 10px;
@@ -472,6 +480,32 @@ h1 span {
   letter-spacing: -0.045em;
   line-height: 1.2;
   white-space: nowrap;
+}
+
+.metric-change {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 630;
+  line-height: 1.35;
+}
+
+.metric-change[data-direction="up"],
+.chart-tooltip-change[data-direction="up"] {
+  color: var(--trend-up);
+}
+
+.metric-change[data-direction="down"],
+.chart-tooltip-change[data-direction="down"] {
+  color: var(--trend-down);
+}
+
+.metric-change[data-direction="unchanged"],
+.metric-change[data-direction="first"],
+.chart-tooltip-change[data-direction="unchanged"],
+.chart-tooltip-change[data-direction="first"] {
+  color: var(--muted);
 }
 
 .metric-unit {
@@ -678,12 +712,32 @@ h1 span {
   outline: none;
 }
 
+.price-chart .chart-crosshair {
+  pointer-events: none;
+}
+
+.price-chart .chart-crosshair-line {
+  stroke: var(--muted);
+  stroke-dasharray: 4 4;
+  stroke-opacity: 0.76;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.price-chart .chart-crosshair-point {
+  fill: var(--surface);
+  stroke: var(--series-color);
+  stroke-width: 2.25;
+  vector-effect: non-scaling-stroke;
+}
+
 .chart-tooltip {
   position: fixed;
   z-index: 20;
   display: grid;
   gap: 3px;
-  max-width: min(280px, calc(100vw - 16px));
+  width: max-content;
+  max-width: min(320px, calc(100vw - 16px));
   padding: 10px 12px;
   border: 1px solid var(--border-strong);
   border-radius: 10px;
@@ -700,14 +754,47 @@ h1 span {
 }
 
 .chart-tooltip-heading {
+  margin-bottom: 2px;
   color: var(--muted);
   font-size: 10px;
+}
+
+.chart-tooltip-list {
+  display: grid;
+  gap: 6px;
+}
+
+.chart-tooltip-row {
+  display: grid;
+  gap: 1px;
+  padding-left: 8px;
+  border-left: 2px solid var(--series-color);
+}
+
+.chart-tooltip-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.chart-tooltip-tariff {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 680;
 }
 
 .chart-tooltip-value {
   font-size: 13px;
   font-weight: 720;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chart-tooltip-change {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 620;
 }
 
 .chart-footnote {
