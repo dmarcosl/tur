@@ -32,7 +32,7 @@ const messages = {
     variableMetric: "Variable",
     effectiveFrom: "Vigente desde",
     officialSource: "Ver fuente oficial",
-    changeVsPrevious: "frente a la revisión anterior",
+    changeVsPrevious: "vs. anterior",
     firstRevision: "Primera revisión",
     noData: "Sin dato",
     temporaryMeasure: "Cálculo sujeto a medidas extraordinarias vigentes para este periodo.",
@@ -78,7 +78,7 @@ const messages = {
     variableMetric: "Variable",
     effectiveFrom: "In effect from",
     officialSource: "View official source",
-    changeVsPrevious: "versus the previous revision",
+    changeVsPrevious: "vs. prev.",
     firstRevision: "First revision",
     noData: "No data",
     temporaryMeasure: "Calculation is subject to temporary measures in effect for this period.",
@@ -498,12 +498,12 @@ function renderChart(svgId, legendId, series, unit, descriptionKey, valueFormatt
   const allValues = [...series.entries()]
     .filter(([tariff]) => visibleTariffs.has(tariff))
     .flatMap(([, points]) => points.map((point) => point.value));
-  svg.replaceChildren(
-    createSvgElement("title", { id: `${svgId}-title` }, language === "es"
-      ? (unit === "€/kWh" ? "Evolución del término variable" : "Evolución del término fijo")
-      : (unit === "€/kWh" ? "Variable charge over time" : "Fixed charge over time")),
-    createSvgElement("desc", { id: `${svgId}-description` }, copy[descriptionKey]),
-  );
+  const chartTitle = language === "es"
+    ? (unit === "€/kWh" ? "Evolución del término variable" : "Evolución del término fijo")
+    : (unit === "€/kWh" ? "Variable charge over time" : "Fixed charge over time");
+  svg.setAttribute("aria-label", chartTitle);
+  svg.setAttribute("aria-describedby", `${svgId}-description`);
+  svg.replaceChildren(createSvgElement("desc", { id: `${svgId}-description` }, copy[descriptionKey]));
 
   const width = 1000;
   const height = 380;
