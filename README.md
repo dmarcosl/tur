@@ -16,7 +16,7 @@ La serie histórica de la CNMC se atribuye a [Componentes de la Tarifa de Últim
 
 La licencia CC BY-SA 4.0 indicada en los metadatos se refiere a la reutilización de la serie de la CNMC; no concede por sí sola una licencia sobre el código de esta aplicación ni se presenta aquí como licencia única para el conjunto de datos compilado. Las disposiciones oficiales publicadas en el BOE están enlazadas individualmente como fuente. La página enlaza y atribuye ambas fuentes.
 
-Este repositorio todavía no contiene un fichero `LICENSE` para el código. Sin una licencia explícita, rige por defecto el derecho de autor: que el repositorio sea público permite verlo en GitHub, pero no otorga una autorización general para reutilizar el código. Si se quiere permitir su reutilización, conviene elegir y añadir una licencia de software independiente de las condiciones de los datos.
+El código de la aplicación se distribuye bajo la licencia MIT (consulta [`LICENSE`](LICENSE)). Esta licencia cubre el código y su documentación, no los datos de `data/tur-prices.json`, que conservan las condiciones de sus fuentes: la serie de la CNMC bajo CC BY-SA 4.0 y las resoluciones del BOE enlazadas individualmente.
 
 La página declara su URL canónica, metadatos Open Graph y JSON-LD de tipo `Dataset`. `robots.txt` permite el rastreo y señala `sitemap.xml`. Estos archivos facilitan que los buscadores descubran la página, pero no garantizan su inclusión en resultados. Para pedir indexación a Google se puede verificar el dominio o la propiedad URL-prefix en Search Console y enviar el sitemap.
 
