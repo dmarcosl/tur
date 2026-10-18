@@ -8,10 +8,69 @@
     <meta name="theme-color" content="#f0f3ef" media="(prefers-color-scheme: light)" />
     <meta
       name="description"
-      content="Consulta los precios vigentes de la TUR de gas y su evolución histórica."
+      content="Consulta los precios vigentes de la tarifa TUR de gas natural y su histórico desde 2009, con enlaces a las fuentes oficiales de la CNMC y el BOE."
     />
+    <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://dmarcosl.github.io/tur/" />
-    <title>dmarcosl.github.io/tur · Precios oficiales TUR</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dmarcosl.github.io/tur/" />
+    <meta property="og:title" content="Precios de la TUR de gas natural · dmarcosl.github.io/tur" />
+    <meta property="og:description" content="Precios vigentes e histórico desde 2009, con fuentes oficiales de la CNMC y el BOE." />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Precios de la TUR de gas natural" />
+    <meta name="twitter:description" content="Precios vigentes e histórico desde 2009, con fuentes oficiales de la CNMC y el BOE." />
+    <link rel="sitemap" type="application/xml" href="https://dmarcosl.github.io/tur/sitemap.xml" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": "https://dmarcosl.github.io/tur/#webpage",
+            "url": "https://dmarcosl.github.io/tur/",
+            "name": "Precios de la TUR de gas natural",
+            "description": "Precios vigentes e histórico desde 2009, con fuentes oficiales de la CNMC y el BOE.",
+            "inLanguage": ["es", "en"],
+            "mainEntity": { "@id": "https://dmarcosl.github.io/tur/#dataset" }
+          },
+          {
+            "@type": "Dataset",
+            "@id": "https://dmarcosl.github.io/tur/#dataset",
+            "name": "Histórico de precios de la Tarifa de Último Recurso (TUR) de gas natural",
+            "description": "Serie histórica de los términos fijo y variable de TUR.1, TUR.2 y TUR.3 en España. Reúne los datos mensuales de la CNMC hasta septiembre de 2021 y las resoluciones oficiales del BOE desde octubre de 2021. Los importes se muestran antes de impuestos.",
+            "url": "https://dmarcosl.github.io/tur/",
+            "inLanguage": "es",
+            "temporalCoverage": "2009-01/2026-10",
+            "spatialCoverage": {
+              "@type": "Place",
+              "name": "España"
+            },
+            "keywords": ["TUR", "gas natural", "tarifa regulada", "precios", "CNMC", "BOE"],
+            "variableMeasured": ["Término fijo (€/mes)", "Término variable (€/kWh)"],
+            "citation": [
+              {
+                "@type": "Dataset",
+                "name": "Componentes de la Tarifa de Último Recurso (CNMC)",
+                "url": "https://catalogodatos.cnmc.es/dataset/ds_1607_1"
+              },
+              {
+                "@type": "CreativeWork",
+                "name": "Resoluciones oficiales publicadas en el BOE",
+                "url": "https://www.boe.es/"
+              }
+            ],
+            "distribution": {
+              "@type": "DataDownload",
+              "contentUrl": "https://dmarcosl.github.io/tur/data/tur-prices.json",
+              "encodingFormat": "application/json"
+            }
+          }
+        ]
+      }
+    </script>
+    <title>Precios de la TUR de gas natural · dmarcosl.github.io/tur</title>
     <link rel="stylesheet" href="./styles.css" />
     <script src="./app.js" defer></script>
   </head>
@@ -122,7 +181,8 @@
 
       <footer class="site-footer">
         <div class="footer-brand">dmarcosl.github.io/tur <span class="footer-separator">/</span> <span data-i18n="footerDescriptor">Datos abiertos, precios regulados</span></div>
-        <p data-i18n="attribution">Serie histórica: CNMC, enero de 2009–septiembre de 2021 (CC BY-SA 4.0). Desde octubre de 2021: resoluciones del BOE.</p>
+        <p><span data-i18n="attribution">Serie histórica de la CNMC, enero de 2009–septiembre de 2021</span> · <a href="https://catalogodatos.cnmc.es/dataset/ds_1607_1" target="_blank" rel="noopener noreferrer" data-i18n="cnmcSourceLink">fuente CNMC</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" data-i18n="cnmcLicenseLink">licencia CC BY-SA 4.0</a>.</p>
+        <p data-i18n="boeAttribution">Desde octubre de 2021: resoluciones del BOE; cada precio enlaza a su publicación oficial.</p>
         <p class="footer-disclaimer" data-i18n="footerDisclaimer">TUR.1–3 · Importes antes de impuestos · No es una estimación de factura</p>
       </footer>
     </div>

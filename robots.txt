@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dmarcosl.github.io/tur/sitemap.xml
