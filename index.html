@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#151919" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f0f3ef" media="(prefers-color-scheme: light)" />
+    <meta
+      name="description"
+      content="Consulta los precios vigentes de la TUR de gas y su evolución histórica."
+    />
+    <link rel="canonical" href="https://dmarcosl.github.io/tur/" />
+    <title>dmarcosl.github.io/tur · Precios oficiales TUR</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="skipLink">Saltar al contenido</a>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="dmarcosl.github.io/tur">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M17.1 3.5c1.1 5.1-4.8 7-4.8 12.6 0 2.3 1.2 3.7 3 4.1-1-2.4.4-4.5 2.4-5.7 3.2 2.7 5.3 5.5 5.3 9.1 0 4.4-3.1 7.4-7.7 7.4-5.2 0-8.8-3.5-8.8-8.7 0-5.6 3.7-9.4 7.8-13.6 1.4-1.4 2.7-3 2.8-5.2Z" />
+            </svg>
+          </span>
+          <span class="brand-name">dmarcosl.github.io/tur</span>
+        </div>
+        <div class="topbar-tools">
+          <span class="theme-indicator">
+            <span class="theme-orbit" aria-hidden="true"></span>
+            <span data-i18n="systemTheme">Tema del sistema</span>
+          </span>
+          <div class="language-switch" role="group" aria-label="Idioma" data-i18n-aria="languageLabel">
+            <button type="button" class="language-button is-selected" data-language="es" aria-pressed="true">ES</button>
+            <button type="button" class="language-button" data-language="en" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="main">
+        <section class="hero" aria-labelledby="page-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-mark"></span><span data-i18n="eyebrow">Gas natural · tarifa regulada</span></p>
+            <h1 id="page-title" data-i18n="title">El precio de la TUR,<br /><span>claro y al día.</span></h1>
+            <p class="hero-description" data-i18n="description">
+              Los términos fijo y variable de TUR.1, TUR.2 y TUR.3, con su fuente oficial y toda su evolución.
+            </p>
+          </div>
+          <div class="hero-aside">
+            <span class="hero-aside-label" data-i18n="unitNoteLabel">Precios publicados</span>
+            <strong data-i18n="unitNoteValue">Antes de impuestos</strong>
+            <span class="hero-aside-rule"></span>
+            <span data-i18n="unitNoteDetail">No incluye el cálculo de una factura individual.</span>
+          </div>
+        </section>
+
+        <section class="current-section" aria-labelledby="current-title">
+          <div class="section-heading current-heading">
+            <div>
+              <p class="section-kicker" data-i18n="currentKicker">EN VIGOR</p>
+              <h2 id="current-title" data-i18n="currentTitle">Precios actuales</h2>
+            </div>
+            <p class="section-aside" data-i18n="currentAside">Una tarjeta por tramo de consumo</p>
+          </div>
+          <div id="price-cards" class="price-grid" aria-live="polite" aria-busy="true">
+            <div class="loading-card"></div>
+            <div class="loading-card"></div>
+            <div class="loading-card"></div>
+          </div>
+        </section>
+
+        <section class="history-section" aria-labelledby="history-title">
+          <div class="section-heading history-heading">
+            <div>
+              <p class="section-kicker" data-i18n="historyKicker">2009 — ACTUALIDAD</p>
+              <h2 id="history-title" data-i18n="historyTitle">Cómo ha cambiado la TUR</h2>
+            </div>
+            <p class="section-aside" data-i18n="historyAside">Tres tarifas, dos componentes</p>
+          </div>
+
+          <div class="chart-grid">
+            <article class="chart-panel">
+              <div class="chart-heading">
+                <div>
+                  <p class="chart-index">01 / <span data-i18n="chartFirstLabel">ENERGÍA</span></p>
+                  <h3 data-i18n="variableTitle">Término variable</h3>
+                </div>
+                <span class="unit-pill">€/kWh</span>
+              </div>
+              <div id="variable-legend" class="legend" role="group" aria-label="Mostrar tarifas" data-i18n-aria="legendLabel"></div>
+              <svg id="variable-chart" class="price-chart" viewBox="0 0 1000 380" role="img" aria-labelledby="variable-chart-title variable-chart-description">
+                <title id="variable-chart-title">Evolución del término variable</title>
+                <desc id="variable-chart-description">Gráfico de escalones con la evolución del término variable de las tarifas TUR.</desc>
+              </svg>
+              <p class="chart-footnote" data-i18n="variableFootnote">El término variable se expresa por kilovatio hora.</p>
+            </article>
+
+            <article class="chart-panel">
+              <div class="chart-heading">
+                <div>
+                  <p class="chart-index">02 / <span data-i18n="chartSecondLabel">CUOTA</span></p>
+                  <h3 data-i18n="fixedTitle">Término fijo</h3>
+                </div>
+                <span class="unit-pill" data-i18n="fixedUnit">€/mes</span>
+              </div>
+              <div id="fixed-legend" class="legend" role="group" aria-label="Mostrar tarifas" data-i18n-aria="legendLabel"></div>
+              <svg id="fixed-chart" class="price-chart" viewBox="0 0 1000 380" role="img" aria-labelledby="fixed-chart-title fixed-chart-description">
+                <title id="fixed-chart-title">Evolución del término fijo</title>
+                <desc id="fixed-chart-description">Gráfico de escalones con la evolución del término fijo de las tarifas TUR.</desc>
+              </svg>
+              <p class="chart-footnote" data-i18n="fixedFootnote">El término fijo se expresa por cliente y mes.</p>
+            </article>
+          </div>
+
+          <p class="chart-interaction-hint" data-i18n="chartInteractionHint">Pasa el cursor o enfoca un punto para consultar su fecha y precio.</p>
+          <p class="history-note">
+            <span class="note-icon" aria-hidden="true">i</span>
+            <span data-i18n="historyNote">La serie de la CNMC es mensual hasta septiembre de 2021. TUR.3 aparece desde octubre de 2021. Las líneas muestran los precios por periodos, no una variación diaria.</span>
+          </p>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-brand">dmarcosl.github.io/tur <span class="footer-separator">/</span> <span data-i18n="footerDescriptor">Datos abiertos, precios regulados</span></div>
+        <p data-i18n="attribution">Serie histórica: CNMC, enero de 2009–septiembre de 2021 (CC BY-SA 4.0). Desde octubre de 2021: resoluciones del BOE.</p>
+        <p class="footer-disclaimer" data-i18n="footerDisclaimer">TUR.1–3 · Importes antes de impuestos · No es una estimación de factura</p>
+      </footer>
+    </div>
+    <div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+    <div id="announcement" class="sr-only" aria-live="polite"></div>
+  </body>
+</html>
